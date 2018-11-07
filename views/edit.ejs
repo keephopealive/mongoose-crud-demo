@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Animal Edit</title>
+</head>
+<body>
+    <h2>Animal Edit</h2>
+    <%= JSON.stringify(animal) %>
+    <form action="/animals/<%= animal._id %>/update" method="POST">
+        <input type="text" name="nickname" value="<%= animal.nickname %>">
+        <input type="number" name="age" value="<%= animal.age %>">
+        <input type="submit">
+    </form>
+    <a href="/">Back</a>
+</body>
+</html>
