@@ -40,7 +40,14 @@ const Animal = mongoose.model("Animal");
 const UserSchema = mongoose.Schema({
     first_name: String,
     last_name: String,
-    email: String,
+    email: {
+        type: String,
+        trim: true,
+        lowercase: true,
+        unique: true,
+        required: 'Email address is required',
+        match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
+    },
     password: String,
 })
 mongoose.model("User", UserSchema);
@@ -80,7 +87,11 @@ app.post("/registration", function(request, response){
     bcrypt.hash(userInstance.password, 10, function(err, hash) {
         userInstance.password = hash;
         userInstance.save(function(err) {
-            response.redirect("/");
+            if(err){
+                console.log(err.errors);
+            } else {
+                response.redirect("/");
+            }
         })
     });
 
@@ -89,6 +100,7 @@ app.post("/registration", function(request, response){
 app.post("/login", function(request, response){
     console.log("POST /login")
     console.log("POST DATA: ", request.body);
+
     User.findOne({email: request.body.email}, function(err, user){
         if(err) {
             console.log("ERROR IN RETRIEVEING USER FOR LOGIN")
