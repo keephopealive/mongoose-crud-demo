@@ -40,12 +40,17 @@ mongoose.model("Animal", AnimalSchema);
 const Animal = mongoose.model("Animal");
 
 
+app.get("/", function(request, response){
+    response.render("home");
+})
+
 // Routing Rules & Logic
-app.get("/", function (request, response) {
+app.get("/animals", function (request, response) {
     console.log("GET /");
     Animal.find(function(err, animals){
         console.log(animals);
-        response.render("dashboard", { animals: animals });
+        // response.render("dashboard", { animals: animals });
+        response.json(animals)
     })
 })
 
@@ -53,31 +58,43 @@ app.post("/animals", function(request, response){
     console.log("POST /animals");
     console.log("POST DATA:", request.body);
     const animalInstance = new Animal();
+    
     animalInstance.nickname = request.body.nickname;
     animalInstance.age = request.body.age;
     animalInstance.save(function(err){
         if(err) { }
-        else { response.redirect("/"); }
+        else { 
+            // response.redirect("/dashboard"); 
+            response.json(animalInstance);
+        }
     })
 })
 
+// app.delete('/animals/:id' ....
 app.get("/animals/:id/delete", function(request, response){
     console.log("GET /animals/:id/delete");
     console.log("PARAM of ID: ", request.params.id)
     Animal.deleteOne({ _id:  request.params.id }, function(err){
         if(err){ console.log(err); }
-        else { response.redirect("/"); }
+        else { 
+            // response.redirect("/");  // ?
+            response.json(true);
+        }
     })
 })
 
+// app.get("/animals/:id" ....
 app.get("/animals/:id/edit", function(request, response){
     console.log("GET /animals/:id/edit");
     console.log("PARAM of ID: ", request.params.id)
     Animal.findOne({ _id: request.params.id }, function(err, animal) {
-        response.render("edit", { animal: animal })
+        // response.render("edit", { animal: animal }) // ?
+        response.json(animal);
     });
 })
 
+// app.put("/animals/:id" .... (POST)
+// app.patch("/animals/:id" .... (POST)
 app.post("/animals/:id/update", function(request, response) {
     console.log("POST /animals/:id/update");
     console.log("PARAM of ID: ", request.params.id)
@@ -90,7 +107,8 @@ app.post("/animals/:id/update", function(request, response) {
             animal.save(function(err){
                 if(err){ }
                 else {
-                    response.redirect("/");
+                    // response.redirect("/"); // ?
+                    response.json(animal);
                 }
             })
         }
