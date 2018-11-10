@@ -13,25 +13,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.set("views", path.join(__dirname, "./views"));
 app.set("view engine", "ejs");
 
-// // Express Session
-// const session = require('express-session');
-// app.set('trust proxy', 1) // trust first proxy
-// app.use(session({
-//     secret: 'keyboard cat',
-//     resave: false,
-//     saveUninitialized: true,
-//     cookie: { secure: true }
-// }))
+// Static Route (for Angular)
+app.use(express.static("./angular-app/dist/angular-app"))
 
-// Flash
-// const flash = require("express-flash");
-// app.use(flash());
-
-
-
+// Mongoose Setup
 const mongoose = require("mongoose");
 mongoose.connect("mongodb://localhost/animals_db")
 
+// Mongoose Models
 const AnimalSchema = mongoose.Schema({
     nickname: String,
     age: Number
@@ -39,21 +28,17 @@ const AnimalSchema = mongoose.Schema({
 mongoose.model("Animal", AnimalSchema);
 const Animal = mongoose.model("Animal");
 
-
-app.get("/", function(request, response){
-    response.render("home");
-})
-
-// Routing Rules & Logic
+// Get ALL
 app.get("/animals", function (request, response) {
     console.log("GET /");
-    Animal.find(function(err, animals){
+    Animal.find({}, function(err, animals){
         console.log(animals);
         // response.render("dashboard", { animals: animals });
         response.json(animals)
     })
 })
 
+// Create 1
 app.post("/animals", function(request, response){
     console.log("POST /animals");
     console.log("POST DATA:", request.body);
@@ -70,8 +55,8 @@ app.post("/animals", function(request, response){
     })
 })
 
-// app.delete('/animals/:id' ....
-app.get("/animals/:id/delete", function(request, response){
+// Destroy 1
+app.delete("/animals/:id", function(request, response){
     console.log("GET /animals/:id/delete");
     console.log("PARAM of ID: ", request.params.id)
     Animal.deleteOne({ _id:  request.params.id }, function(err){
@@ -83,8 +68,8 @@ app.get("/animals/:id/delete", function(request, response){
     })
 })
 
-// app.get("/animals/:id" ....
-app.get("/animals/:id/edit", function(request, response){
+// Get 1
+app.get("/animals/:id", function(request, response){
     console.log("GET /animals/:id/edit");
     console.log("PARAM of ID: ", request.params.id)
     Animal.findOne({ _id: request.params.id }, function(err, animal) {
@@ -93,9 +78,8 @@ app.get("/animals/:id/edit", function(request, response){
     });
 })
 
-// app.put("/animals/:id" .... (POST)
-// app.patch("/animals/:id" .... (POST)
-app.post("/animals/:id/update", function(request, response) {
+// Update 1
+app.put("/animals/:id", function(request, response) {
     console.log("POST /animals/:id/update");
     console.log("PARAM of ID: ", request.params.id)
     console.log("POST DATA:", request.body);
